@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Погода</title>
+    </head>
+    <body>
+        <h1>Введите название города:</h1>
+        <form method="post" action="/weather?={{city}}">
+            <input type="text" name="city">
+            <button type="submit">Получить погоду</button>
+        </form>
+    </body>
+</html>
