@@ -40,8 +40,5 @@
 - **pydantic-settings**: Валидация конфигурационного файла.
 
 ## Запуск приложения
-1. Убедитесь, что у вас установлен Python (версия 3.7 или выше).
-2. Установите зависимости:
-   ```bash
-   pip install fastapi uvicorn httpx geopy timezonefinder pytz
+1. ```docker build .``` в папке проекта
 ![img.png](img.png)
