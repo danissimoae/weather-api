@@ -1,22 +1,26 @@
-from fastapi.testclient import TestClient
+import pytest
+from httpx import AsyncClient
 
 from app.main import app
 
-client = TestClient(app)
 
-def test_homepage():
-    response = client.get("/weather/")
+@pytest.mark.asyncio
+async def test_home():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get("/weather/")
     assert response.status_code == 200
-    assert b"Weather App" in response.content
+    assert "Weather App" in response.text
 
-def test_get_weather():
-    response = client.post("/weather/", json={"city_data": "New York"})
+@pytest.mark.asyncio
+async def test_autocomplete():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get("/weather/autocomplete?query=New")
     assert response.status_code == 200
-    assert b"Weather for New York" in response.content
+    assert isinstance(response.json(), list)
 
-def test_autocomplete():
-    response = client.get("/weather/autocomplete?city=New")
+@pytest.mark.asyncio
+async def test_get_weather():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.post("/weather/", json={"city_data": "New York"})
     assert response.status_code == 200
-    suggestions = response.json()
-    assert isinstance(suggestions, list)
-    assert len(suggestions) > 0
+    assert "Weather for New York" in response.text
