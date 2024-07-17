@@ -1,34 +1,17 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Погода в {{ city }}</title>
-    </head>
-    <body>
-        <h1>Погода в {{ city }}</h1>
-        <p>Текущее время: {{ current_time }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Время</th>
-                    <th>Температура</th>
-                    <th>Влажность</th>
-                    <th>Ощущается как</th>
-                    <th>Осадки</th>
-                    <th>Скорость ветра</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in weather_data.hourly %}
-                <tr>
-                    <td>{{ data.timestamp_local }}</td>
-                    <td>{{ data.temperature_2m }}°C</td>
-                    <td>{{ data.relative_humidity_2m }}%</td>
-                    <td>{{ data.apparent_temperature }}°C</td>
-                    <td>{{ data.precipitation }} мм</td>
-                    <td>{{ data.wind_speed_10m }} м/с</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data</title>
+</head>
+<body>
+    <h1>Погода в {{ city }}</h1>
+    <p>Текущее время: {{ current_time }}</p>
+    <p>Температура: {{ weather_data.current.temperature_2m }}°C</p>
+    <p>Влажность: {{ weather_data.current.relative_humidity_2m }}%</p>
+    <p>Ощущается как: {{ weather_data.current.apparent_temperature }}°C</p>
+    <p>Осадки: {{ weather_data.current.precipitation }}mm</p>
+    <p>Скорость ветра: {{ weather_data.current.wind_speed_10m }}m/s</p>
+</body>
 </html>
