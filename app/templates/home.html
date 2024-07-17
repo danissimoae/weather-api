@@ -58,7 +58,7 @@ background-color: #f5f5f5;
 button {
 width: 100%;
 padding: 10px;
-background-color: #007bff;
+background-color: rgba(0, 123, 255, 0.78);
 color: white;
 border: none;
 border-radius: 5px;
@@ -85,8 +85,8 @@ cityInput.value = lastCity;
 cityInput.addEventListener("input", async () => {
 const query = cityInput.value;
 if (query.length < 3) {
-suggestionsBox.innerHTML = "";
-suggestionsBox.style.display = 'none';
+suggestionsBox.innerHTML = "Москва";
+suggestionsBox.style.display = '';
 return;
 }
 const response = await fetch(`/weather/autocomplete?query=${query}`);
@@ -116,24 +116,24 @@ const data = await response.text();
 document.getElementById("result").innerHTML = data;
 } else {
 const error = await response.json();
-document.getElementById("result").innerText = `Error: ${error.message}`;
+document.getElementById("result").innerText = `Ошибка: ${error.detail}`;
 }
 }
 
 function selectCity(city) {
 document.getElementById("city").value = city;
-docu
-ment.getElementById("suggestions").innerHTML = "";
+docum
+ent.getElementById("suggestions").innerHTML = "";
 document.getElementById("suggestions").style.display = 'none';
 }
 </script>
 </head>
 <body>
 <div class="container">
-<h1>Weather App</h1>
-<input type="text" id="city" placeholder="Enter city name">
+<h1>Узнать погоду</h1>
+<input type="text" id="city" placeholder="Введите название города">
 <ul id="suggestions"></ul>
-<button onclick="getWeather()">Get Weather</button>
+<button onclick="getWeather()">Поиск</button>
 <div id="result"></div>
 </div>
 </body>
