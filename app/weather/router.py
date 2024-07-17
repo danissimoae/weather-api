@@ -1,15 +1,14 @@
 import datetime
 import logging
+from datetime import datetime
 
-from fastapi import APIRouter, Request, Form
-from fastapi.templating import Jinja2Templates
 import httpx
+import pytz
+from fastapi import APIRouter, Request
+from fastapi.templating import Jinja2Templates
 from geopy.geocoders import Nominatim
 from pydantic import BaseModel
 from timezonefinder import TimezoneFinder
-import pytz
-from datetime import datetime
-
 
 router = APIRouter(
     prefix="/weather",
@@ -49,9 +48,15 @@ async def get_weather(request: Request, city_data: CityData):
             response.raise_for_status()
             weather_data = response.json()
 
-        return templates.TemplateResponse("weather.html",
-                                          {"request": request, "city": city_data, "weather_data": weather_data,
-                                           "current_time": current_time})
+        response = templates.TemplateResponse("weather.html",
+                                          {"request": request,
+                                           "city": city_data,
+                                           "weather_data": weather_data,
+                                           "current_time": current_time
+                                           })
+        response.set_cookie("last_city", city_data.city_data)
+        return response
+
     except Exception as e:
         logger.error(f"Error fetching weather data: {e}")
         raise FetchingDataException
@@ -59,6 +64,7 @@ async def get_weather(request: Request, city_data: CityData):
 
 
 from fastapi import HTTPException, status
+
 
 
 class WeatherException(HTTPException):
