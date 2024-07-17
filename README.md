@@ -40,5 +40,11 @@
 - **pydantic-settings**: Валидация конфигурационного файла.
 
 ## Запуск приложения
-1. ```docker build .``` в папке проекта
+Шаг 1: Построение Docker образа
+```docker build -t weather-api.```
+
+Шаг 2: Запуск Docker контейнера с использованием переменных окружения из файла .env
+```docker run -d -p 8000:8000 --name weather-container --env-file .env weather-api```
+
+
 ![img.png](img.png)
