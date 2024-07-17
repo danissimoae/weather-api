@@ -16,13 +16,14 @@ background-color: #f5f5f5;
 color: #333;
 }
 .container {
+position: relative;
 text-align: center;
 max-width: 400px;
 width: 100%;
 background: white;
 padding: 20px;
 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-border-radius: 15px;
+border-radius: 10px;
 }
 input[type="text"] {
 width: calc(100% - 20px);
@@ -31,6 +32,28 @@ margin: 10px 0;
 border: 1px solid #ddd;
 border-radius: 5px;
 font-size: 16px;
+}
+ul {
+list-style-type: none;
+padding: 0;
+margin: 0;
+background: white;
+border: 1px solid #ddd;
+border-radius: 5px;
+max-height: 100px;
+overflow-y: auto;
+position: absolute;
+width: calc(100% - 20px);
+z-index: 1000;
+left: 10px;
+top: 45px;
+}
+ul li {
+padding: 10px;
+cursor: pointer;
+}
+ul li:hover {
+background-color: #f5f5f5;
 }
 button {
 width: 100%;
@@ -50,6 +73,35 @@ margin-top: 20px;
 }
 </style>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+const cityInput = document.getElementById("city");
+const suggestionsBox = document.getElementById("suggestions");
+const lastCity = "{{ last_city }}";
+
+if (lastCity) {
+cityInput.value = lastCity;
+}
+
+cityInput.addEventListener("input", async () => {
+const query = cityInput.value;
+if (query.length < 3) {
+suggestionsBox.innerHTML = "";
+suggestionsBox.style.display = 'none';
+return;
+}
+const response = await fetch(`/weather/autocomplete?query=${query}`);
+const suggestions = await response.json();
+suggestionsBox.innerHTML = suggestions.map(s => `<li onclick="selectCity('${s}')">${s}</li>`).join("");
+suggestionsBox.style.display = 'block';
+});
+
+document.addEventListener("click", (event) => {
+if (!event.target.closest('.container')) {
+suggestionsBox.style.display = 'none';
+}
+});
+});
+
 async function getWeather() {
 const city = document.getElementById("city").value;
 const response = await fetch("/weather/", {
@@ -64,18 +116,25 @@ const data = await response.text();
 document.getElementById("result").innerHTML = data;
 } else {
 const error = await response.json();
-document.getElementById("result").innerText = `Ошибка: ${error.message}`;
+document.getElementById("result").innerText = `Error: ${error.message}`;
 }
+}
+
+function selectCity(city) {
+document.getElementById("city").value = city;
+docu
+ment.getElementById("suggestions").innerHTML = "";
+document.getElementById("suggestions").style.display = 'none';
 }
 </script>
 </head>
 <body>
 <div class="container">
 <h1>Weather App</h1>
-<input type="text" id="city" placeholder="Введите название города">
-<button onclick="getWeather()">Узнать . . .</button>
+<input type="text" id="city" placeholder="Enter city name">
+<ul id="suggestions"></ul>
+<button onclick="getWeather()">Get Weather</button>
 <div id="result"></div>
 </div>
 </body>
 </html>
-

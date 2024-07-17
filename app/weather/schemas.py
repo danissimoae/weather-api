@@ -1,4 +1,5 @@
 from pydantic import BaseModel
 
-class CitySchema(BaseModel):
-    city: str
+
+class CityData(BaseModel):
+    city_data: str

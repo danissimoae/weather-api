@@ -4,7 +4,7 @@ import logging
 
 from starlette.responses import JSONResponse
 
-from weather.router import router as weather_router
+from app.weather.router import router as weather_router
 
 app = FastAPI(
     title="Weather API",

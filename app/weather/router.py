@@ -1,36 +1,39 @@
 import datetime
 import logging
-from datetime import datetime
-
 import httpx
 import pytz
-from fastapi import APIRouter, Request
+
+from datetime import datetime
+from fastapi import APIRouter, Request, Query
 from fastapi.templating import Jinja2Templates
 from geopy.geocoders import Nominatim
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 from timezonefinder import TimezoneFinder
+from typing_extensions import List
+
+from app.weather.exceptions import *
+from app.weather.schemas import CityData
 
 router = APIRouter(
     prefix="/weather",
     tags=["Погода"],
 )
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 logger = logging.getLogger(__name__)
 geolocator = Nominatim(user_agent="weather_app")
 
-
-class CityData(BaseModel):
-    city_data: str
-
-
 @router.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+    """Главная страница"""
+    last_city = request.cookies.get("last_city")
+    return templates.TemplateResponse("home.html", {"request": request,
+                                                    "last_city": last_city})
 
 
 @router.post("/")
 async def get_weather(request: Request, city_data: CityData):
+    """Post-запрос для получения данных о погоде"""
     try:
         location = geolocator.geocode(city_data.city_data)
         if location is None:
@@ -49,11 +52,11 @@ async def get_weather(request: Request, city_data: CityData):
             weather_data = response.json()
 
         response = templates.TemplateResponse("weather.html",
-                                          {"request": request,
-                                           "city": city_data,
-                                           "weather_data": weather_data,
-                                           "current_time": current_time
-                                           })
+                                              {"request": request,
+                                               "city": city_data,
+                                               "weather_data": weather_data,
+                                               "current_time": current_time
+                                               })
         response.set_cookie("last_city", city_data.city_data)
         return response
 
@@ -63,32 +66,11 @@ async def get_weather(request: Request, city_data: CityData):
 
 
 
-from fastapi import HTTPException, status
-
-
-
-class WeatherException(HTTPException):
-    status_code = 500
-    detail = ""
-
-    def __init__(self):
-        super().__init__(
-            status_code=self.status_code,
-            detail=self.detail
-        )
-
-
-class CityNotFoundException(WeatherException):
-    status_code = status.HTTP_404_NOT_FOUND
-    detail = "Город не найден / City not found :("
-
-
-class TimeZoneNotFoundException(WeatherException):
-    status_code = status.HTTP_404_NOT_FOUND
-    detail = "Временной пояс не найден / Timezone not found :("
-
-
-class FetchingDataException(WeatherException):
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    detail = "Ошибка получения данных / Fetching data error :("
-
+@router.get("/autocomplete", response_model=List[str])
+async def autocomplete(city: str = Query(...)):
+    """Подсказки для поиска"""
+    locations = geolocator.geocode(city,
+                                   exactly_one=False,
+                                   limit=3)
+    suggestions = [location.address for location in locations] if locations else []
+    return JSONResponse(content=suggestions)
