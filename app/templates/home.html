@@ -1,13 +1,148 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Погода</title>
-    </head>
-    <body>
-        <h1>Введите название города:</h1>
-        <form method="post" action="/weather?={{city}}">
-            <input type="text" name="city">
-            <button type="submit">Получить погоду</button>
-        </form>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #a8c0ff, #3f2b96); /* Градиентный фон */
+            color: #333;
+        }
+        .container {
+            position: relative;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        button {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: rgba(255, 106, 0, 0.66);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #b34b00;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+            top: 100%;
+            left: 0;
+        }
+        ul li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        ul li:hover {
+            background-color: #f5f5f5;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const cityInput = document.getElementById("city");
+            const suggestionsBox = document.getElementById("suggestions");
+            const lastCity = "{{ last_city }}";
+
+            if (lastCity) {
+                cityInput.value = lastCity;
+            }
+
+            cityInput.addEventListener("input", async () => {
+                const query = cityInput.value;
+                if (query.length < 3) {
+                    suggestionsBox.innerHTML = "";
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+                const response = await fetch(`/weather/autocomplete?query=${query}`);
+                const suggestions = await response.json();
+                suggestionsBox.innerHTML = suggestions.map(s => `<li onclick="selectCity('${s}')">${s}</li>`).join("");
+                suggestionsBox.style.display = 'block';
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!event.target.closest('.container')) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        });
+
+        async function getWeather() {
+            const city = document.getElementById("city").value;
+            const response = await fetch("/weather/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ city_data: city })
+            });
+            if (response.ok) {
+                const data = await response.text();
+                document.getElementById("result").innerHTML = data;
+            } else {
+                const error = await response.json();
+                document.getElementById("result").innerText = ` ${error.detail}`;
+            }
+        }
+
+        function selectCity(city) {
+            document.getElementById("city").value = city;
+            document.getElementById("suggestions").innerHTML = "";
+            document.getElementById("suggestions").style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Прогноз погоды 🌤️</h1>
+        <div class="input-group">
+            <input type="text" id="city" placeholder="Введите название города">
+            <button onclick="getWeather()">Узнать</button>
+        </div>
+        <ul id="suggestions"></ul>
+        <div id="result"></div>
+    </div>
+</body>
 </html>

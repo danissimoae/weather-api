@@ -1,34 +1,50 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Погода в {{ city }}</title>
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #a8c0ff, #3f2b96); /* Градиентный фон */
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8); /* Полупрозрачный фон */
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+        .weather-info {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .weather-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
         <h1>Погода в {{ city }}</h1>
         <p>Текущее время: {{ current_time }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Время</th>
-                    <th>Температура</th>
-                    <th>Влажность</th>
-                    <th>Ощущается как</th>
-                    <th>Осадки</th>
-                    <th>Скорость ветра</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in weather_data.hourly %}
-                <tr>
-                    <td>{{ data.timestamp_local }}</td>
-                    <td>{{ data.temperature_2m }}°C</td>
-                    <td>{{ data.relative_humidity_2m }}%</td>
-                    <td>{{ data.apparent_temperature }}°C</td>
-                    <td>{{ data.precipitation }} мм</td>
-                    <td>{{ data.wind_speed_10m }} м/с</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </body>
+        <div class="weather-info">
+            <p>Температура: {{ weather_data.current.temperature_2m }}°C</p>
+            <p>Влажность: {{ weather_data.current.relative_humidity_2m }}%</p>
+            <p>Кажущаяся температура: {{ weather_data.current.apparent_temperature }}°C</p>
+            <p>Осадки: {{ weather_data.current.precipitation }}mm</p>
+            <p>Скорость ветра: {{ weather_data.current.wind_speed_10m }}m/s</p>
+        </div>
+    </div>
+</body>
 </html>
