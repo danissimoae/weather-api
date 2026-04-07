@@ -3,146 +3,1076 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Погода, одежда</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --accent-color: #667eea;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to right, #a8c0ff, #3f2b96); /* Градиентный фон */
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-primary);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        /* Анимированный фон */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(-5%, -5%); }
+            66% { transform: translate(5%, 5%); }
+        }
+
         .container {
             position: relative;
-            text-align: center;
-            max-width: 400px;
+            max-width: 480px;
             width: 100%;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
+            animation: slideUp 0.5s ease-out;
         }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Современные табы */
+        .tabs {
+            display: flex;
+            padding: 20px 20px 0 20px;
+            gap: 10px;
+            background: transparent;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            border-radius: 20px;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab.active {
+            color: white;
+            background: var(--accent-gradient);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab.active::before {
+            opacity: 1;
+        }
+
+        .tab-content {
+            padding: 30px 25px;
+            overflow: visible;
+        }
+
+        .tab-pane {
+            display: none;
+            overflow: visible;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Заголовки */
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Поиск */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
         .input-group {
             display: flex;
-            justify-content: space-between;
+            gap: 12px;
             align-items: center;
         }
-        input[type="text"] {
+
+        .input-wrapper {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
-            font-size: 16px;
+            position: relative;
         }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Кнопки */
         button {
-            margin-left: 10px;
-            padding: 10px;
-            background-color: rgba(255, 106, 0, 0.66);
+            padding: 14px 24px;
+            background: var(--accent-gradient);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
+
         button:hover {
-            background-color: #b34b00;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            max-height: 100px;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            box-shadow: none;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Подсказки */
+        .suggestions-list {
+            list-style: none;
+            padding: 8px 0;
+            margin: 8px 0 0 0;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            max-height: 200px;
             overflow-y: auto;
             position: absolute;
             width: 100%;
             z-index: 1000;
             top: 100%;
             left: 0;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(10px);
         }
-        ul li {
-            padding: 10px;
+
+        .suggestions-list li {
+            padding: 12px 20px;
             cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        ul li:hover {
-            background-color: #f5f5f5;
+
+        .suggestions-list li::before {
+            content: '📍';
+            font-size: 16px;
+            opacity: 0.7;
         }
+
+        .suggestions-list li:hover {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            padding-left: 25px;
+        }
+
+        /* Результаты погоды */
         #result {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: left;
             width: 100%;
+            animation: fadeIn 0.5s ease-out;
         }
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const cityInput = document.getElementById("city");
-            const suggestionsBox = document.getElementById("suggestions");
-            const lastCity = "{{ last_city }}";
 
-            if (lastCity) {
-                cityInput.value = lastCity;
+        .weather-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .weather-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .weather-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .weather-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .weather-info-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 15px;
+            transition: transform 0.2s ease;
+        }
+
+        .weather-info-item:hover {
+            transform: scale(1.05);
+            background: #edf2f7;
+        }
+
+        .weather-info-item p {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .weather-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Рекомендации по одежде */
+        .clothing-content {
+            padding: 5px 0;
+        }
+
+        .clothing-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .clothing-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .weather-summary {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .weather-summary h3 {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weather-summary p {
+            margin: 8px 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .clothing-recommendations {
+            margin-top: 20px;
+        }
+
+        .clothing-category {
+            margin-bottom: 20px;
+            padding: 18px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .clothing-category:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(5px);
+        }
+
+        .clothing-category h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .clothing-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .clothing-item {
+            background: #f7fafc;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .clothing-item:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Состояния загрузки и ошибок */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: var(--danger-color);
+            padding: 15px 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 500;
+            border: 2px solid #feb2b2;
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
             }
 
-            cityInput.addEventListener("input", async () => {
-                const query = cityInput.value;
-                if (query.length < 3) {
-                    suggestionsBox.innerHTML = "";
-                    suggestionsBox.style.display = 'none';
-                    return;
-                }
-                const response = await fetch(`/weather/autocomplete?query=${query}`);
-                const suggestions = await response.json();
-                suggestionsBox.innerHTML = suggestions.map(s => `<li onclick="selectCity('${s}')">${s}</li>`).join("");
-                suggestionsBox.style.display = 'block';
-            });
+            .container {
+                border-radius: 25px;
+            }
 
-            document.addEventListener("click", (event) => {
-                if (!event.target.closest('.container')) {
-                    suggestionsBox.style.display = 'none';
+            .tab-content {
+                padding: 20px 18px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .weather-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="weather-tab">
+                <span>🌤️</span> Погода
+            </button>
+            <button class="tab" data-tab="clothing-tab">
+                <span>👕</span> Стиль
+            </button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Weather Tab -->
+            <div id="weather-tab" class="tab-pane active">
+                <h1>Прогноз погоды</h1>
+                <div class="search-wrapper">
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔍</span>
+                            <input type="text" id="city" placeholder="Введите город" autocomplete="off">
+                        </div>
+                        <button onclick="getWeather()">Узнать</button>
+                    </div>
+                    <ul id="suggestions" class="suggestions-list" style="display: none;"></ul>
+                </div>
+                <div id="result"></div>
+            </div>
+
+            <!-- Clothing Tab -->
+            <div id="clothing-tab" class="tab-pane">
+                <div class="clothing-content">
+                    <div class="clothing-header">
+                        <h2>Оденемся по погоде</h2>
+                        <p>Подберем образ по текущей погоде</p>
+                    </div>
+
+                    <div class="search-wrapper">
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔍</span>
+                                <input type="text" id="clothing-city" placeholder="Введите город" autocomplete="off">
+                            </div>
+                            <button onclick="getClothingRecommendation()">Подобрать</button>
+                        </div>
+                        <ul id="clothing-suggestions" class="suggestions-list" style="display: none;"></ul>
+                    </div>
+
+                    <div id="clothing-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Общие переменные
+        let currentWeatherData = null;
+        let currentCity = "";
+
+        // Элементы для погоды
+        const cityInput = document.getElementById("city");
+        const suggestionsBox = document.getElementById("suggestions");
+        const lastCity = "{{ last_city }}";
+
+        // Элементы для одежды
+        const clothingCityInput = document.getElementById("clothing-city");
+        const clothingSuggestionsBox = document.getElementById("clothing-suggestions");
+        const clothingResult = document.getElementById("clothing-result");
+
+        // Табы
+        const tabs = document.querySelectorAll('.tab');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        // Переключение табов
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.style.transform = 'scale(1)';
+                });
+                panes.forEach(p => p.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+
+                // Скрываем подсказки при переключении табов
+                suggestionsBox.style.display = 'none';
+                clothingSuggestionsBox.style.display = 'none';
+
+                // Если переключаемся на вкладку одежды и есть данные о погоде, показываем их
+                if (targetTab === 'clothing-tab' && currentWeatherData && currentCity) {
+                    displayClothingRecommendation(currentWeatherData, currentCity);
                 }
             });
         });
 
-        async function getWeather() {
-            const city = document.getElementById("city").value;
-            const response = await fetch("/weather/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ city_data: city })
-            });
-            if (response.ok) {
-                const data = await response.text();
-                document.getElementById("result").innerHTML = data;
-            } else {
-                const error = await response.json();
-                document.getElementById("result").innerText = ` ${error.detail}`;
-            }
+        // Устанавливаем последний город если есть
+        if (lastCity && lastCity !== "None") {
+            cityInput.value = lastCity;
+            clothingCityInput.value = lastCity;
         }
 
-        function selectCity(city) {
-            document.getElementById("city").value = city;
-            document.getElementById("suggestions").innerHTML = "";
-            document.getElementById("suggestions").style.display = 'none';
+        // Функция для автодополнения
+        function setupAutocomplete(inputElement, suggestionsElement) {
+            let timeoutId;
+
+            inputElement.addEventListener("input", async () => {
+                clearTimeout(timeoutId);
+                const query = inputElement.value.trim();
+
+                if (query.length < 3) {
+                    suggestionsElement.innerHTML = "";
+                    suggestionsElement.style.display = 'none';
+                    return;
+                }
+
+                timeoutId = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/weather/autocomplete?query=${encodeURIComponent(query)}`);
+                        const suggestions = await response.json();
+
+                        if (suggestions && suggestions.length > 0) {
+                            suggestionsElement.innerHTML = suggestions.map(s =>
+                                `<li onclick="selectCityFor('${s.replace(/'/g, "\\'")}', '${inputElement.id}')">${s}</li>`
+                            ).join("");
+                            suggestionsElement.style.display = 'block';
+                        } else {
+                            suggestionsElement.innerHTML = "";
+                            suggestionsElement.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error("Error fetching suggestions:", error);
+                        suggestionsElement.style.display = 'none';
+                    }
+                }, 300);
+            });
+
+            inputElement.addEventListener("focus", () => {
+                if (inputElement.value.length >= 3) {
+                    inputElement.dispatchEvent(new Event('input'));
+                }
+            });
         }
+
+        // Настройка автодополнения для обоих полей
+        setupAutocomplete(cityInput, suggestionsBox);
+        setupAutocomplete(clothingCityInput, clothingSuggestionsBox);
+
+        // Функция выбора города
+        window.selectCityFor = function(city, inputId) {
+            const input = document.getElementById(inputId);
+            input.value = city;
+
+            // Скрываем соответствующие подсказки
+            if (inputId === 'city') {
+                suggestionsBox.innerHTML = "";
+                suggestionsBox.style.display = 'none';
+            } else {
+                clothingSuggestionsBox.innerHTML = "";
+                clothingSuggestionsBox.style.display = 'none';
+            }
+        };
+
+        // Закрытие подсказок при клике вне
+        document.addEventListener("click", (event) => {
+            const searchWrapper = event.target.closest('.search-wrapper');
+            if (!searchWrapper) {
+                suggestionsBox.style.display = 'none';
+                clothingSuggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Получение погоды
+        window.getWeather = async function() {
+            const city = cityInput.value.trim();
+            if (!city) {
+                document.getElementById("result").innerHTML = '<p class="error-message">📍 Введите название города</p>';
+                return;
+            }
+
+            document.getElementById("result").innerHTML = '<p class="loading">Получаем данные о погоде</p>';
+
+            try {
+                const response = await fetch("/weather/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ city_data: city })
+                });
+
+                if (response.ok) {
+                    const data = await response.text();
+
+                    // Создаем красивую карточку погоды
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+
+                    // Извлекаем данные
+                    const cityName = doc.querySelector('h2')?.textContent || city;
+                    const timeMatch = doc.body.textContent.match(/Текущее время:\s*(.+)/);
+                    const tempMatch = doc.body.textContent.match(/Температура:\s*([-\d.]+)°C/);
+                    const humidityMatch = doc.body.textContent.match(/Влажность:\s*([\d.]+)%/);
+                    const feelsMatch = doc.body.textContent.match(/Ощущается как:\s*([-\d.]+)°C/);
+                    const precipMatch = doc.body.textContent.match(/Осадки:\s*([\d.]+)\s*mm/);
+                    const windMatch = doc.body.textContent.match(/Скорость ветра:\s*([\d.]+)\s*m\/s/);
+
+                    const time = timeMatch ? timeMatch[1] : '';
+                    const temp = tempMatch ? tempMatch[1] : 'N/A';
+                    const humidity = humidityMatch ? humidityMatch[1] : 'N/A';
+                    const feels = feelsMatch ? feelsMatch[1] : 'N/A';
+                    const precip = precipMatch ? precipMatch[1] : '0';
+                    const wind = windMatch ? windMatch[1] : 'N/A';
+
+                    // Сохраняем данные для вкладки одежды
+                    currentCity = city;
+                    clothingCityInput.value = city;
+                    currentWeatherData = {
+                        temperature: parseFloat(temp),
+                        humidity: parseFloat(humidity),
+                        wind_speed: parseFloat(wind),
+                        precipitation: parseFloat(precip)
+                    };
+
+                    // Создаем современную карточку погоды
+                    const weatherHtml = `
+                        <div class="weather-card">
+                            <div class="weather-header">
+                                <h2>
+                                    <span>📍</span> ${cityName.replace('📍', '').trim()}
+                                </h2>
+                                <p style="color: var(--text-secondary); font-size: 14px;">🕐 ${time}</p>
+                            </div>
+                            <div class="weather-info-grid">
+                                <div class="weather-info-item">
+                                    <p>
+                                        <span class="weather-label">🌡️ Температура</span>
+                                        <span class="weather-value">${temp}°C</span>
+                                    </p>
+                                </div>
+                                <div class="weather-info-item">
+                                    <p>
+                                        <span class="weather-label">🤔 Ощущается</span>
+                                        <span class="weather-value">${feels}°C</span>
+                                    </p>
+                                </div>
+                                <div class="weather-info-item">
+                                    <p>
+                                        <span class="weather-label">💧 Влажность</span>
+                                        <span class="weather-value">${humidity}%</span>
+                                    </p>
+                                </div>
+                                <div class="weather-info-item">
+                                    <p>
+                                        <span class="weather-label">💨 Ветер</span>
+                                        <span class="weather-value">${wind} м/с</span>
+                                    </p>
+                                </div>
+                                <div class="weather-info-item">
+                                    <p>
+                                        <span class="weather-label">🌧️ Осадки</span>
+                                        <span class="weather-value">${precip} мм</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById("result").innerHTML = weatherHtml;
+                    suggestionsBox.style.display = 'none';
+                } else {
+                    const error = await response.json();
+                    document.getElementById("result").innerHTML = `<p class="error-message">❌ ${error.detail || 'Город не найден'}</p>`;
+                }
+            } catch (error) {
+                console.error("Error getting weather:", error);
+                document.getElementById("result").innerHTML = '<p class="error-message">❌ Ошибка соединения</p>';
+            }
+        };
+
+        // Получение рекомендаций по одежде
+        window.getClothingRecommendation = async function() {
+            const city = clothingCityInput.value.trim();
+            if (!city) {
+                clothingResult.innerHTML = '<p class="error-message">📍 Введите название города</p>';
+                return;
+            }
+
+            clothingResult.innerHTML = '<p class="loading">Анализируем погоду</p>';
+
+            try {
+                const weatherResponse = await fetch("/weather/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ city_data: city })
+                });
+
+                if (!weatherResponse.ok) {
+                    throw new Error('Ошибка получения погоды');
+                }
+
+                const html = await weatherResponse.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const tempMatch = doc.body.textContent.match(/Температура:\s*([-\d.]+)°C/);
+                const windMatch = doc.body.textContent.match(/Скорость ветра:\s*([\d.]+)\s*m\/s/);
+                const precipMatch = doc.body.textContent.match(/Осадки:\s*([\d.]+)\s*mm/);
+
+                if (tempMatch) {
+                    const weatherData = {
+                        temperature: parseFloat(tempMatch[1]),
+                        wind_speed: windMatch ? parseFloat(windMatch[1]) : 0,
+                        precipitation: precipMatch ? parseFloat(precipMatch[1]) : 0
+                    };
+
+                    currentWeatherData = weatherData;
+                    currentCity = city;
+                    cityInput.value = city;
+
+                    displayClothingRecommendation(weatherData, city);
+                } else {
+                    throw new Error('Не удалось получить данные о погоде');
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                clothingResult.innerHTML = '<p class="error-message">❌ Город не найден</p>';
+            }
+
+            clothingSuggestionsBox.style.display = 'none';
+        };
+
+        // Отображение рекомендаций по одежде
+        function displayClothingRecommendation(weatherData, city) {
+            const temp = weatherData.temperature;
+            const wind = weatherData.wind_speed;
+            const precip = weatherData.precipitation;
+
+            const hasPrecipitation = precip > 0.1;
+            const isWindy = wind > 8;
+            const isVeryWindy = wind > 15;
+
+            const recommendations = getClothingRecommendations(temp, hasPrecipitation, isWindy, isVeryWindy);
+
+            let weatherDescription = '';
+            let weatherEmoji = '';
+            if (temp < 0) { weatherDescription = 'Морозно'; weatherEmoji = '❄️'; }
+            else if (temp < 10) { weatherDescription = 'Прохладно'; weatherEmoji = '🌡️'; }
+            else if (temp < 20) { weatherDescription = 'Тепло'; weatherEmoji = '🌤️'; }
+            else { weatherDescription = 'Жарко'; weatherEmoji = '☀️'; }
+
+            if (hasPrecipitation) weatherDescription += ' • 🌧️ Осадки';
+            if (isWindy) weatherDescription += ' • 💨 Ветрено';
+
+            const html = `
+                <div class="weather-summary">
+                    <h3>
+                        <span>📍</span> ${city}
+                    </h3>
+                    <p>
+                        <span style="font-size: 24px; margin-right: 10px;">${weatherEmoji}</span>
+                        ${temp}°C • ${weatherDescription}
+                    </p>
+                    <p>💨 Ветер: ${wind} м/с • 💧 Осадки: ${precip} мм</p>
+                </div>
+
+                <div class="clothing-recommendations">
+                    ${recommendations.map(rec => `
+                        <div class="clothing-category">
+                            <h3>${rec.icon} ${rec.category}</h3>
+                            <div class="clothing-items">
+                                ${rec.items.map(item => `
+                                    <span class="clothing-item">${item}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <button class="btn-secondary" onclick="switchToWeatherTab()">
+                    🌤️ Смотреть прогноз
+                </button>
+            `;
+
+            clothingResult.innerHTML = html;
+        }
+
+        // Функция для генерации рекомендаций
+        function getClothingRecommendations(temp, hasPrecipitation, isWindy, isVeryWindy) {
+            const recommendations = [];
+
+            // Верхняя одежда
+            let outerwear = [];
+            if (temp < 0) {
+                outerwear = ['🧥 Пуховик', '🧣 Шарф', '🧤 Перчатки'];
+            } else if (temp < 10) {
+                outerwear = ['🧥 Куртка', '🧥 Пальто', '🧥 Ветровка'];
+                if (isWindy) outerwear.push('💨 Ветрозащита');
+            } else if (temp < 20) {
+                outerwear = ['👔 Легкая куртка', '🧥 Кардиган', '👕 Толстовка'];
+            } else {
+                outerwear = ['👕 Футболка', '👚 Рубашка', '🎽 Топ'];
+            }
+
+            if (hasPrecipitation) {
+                outerwear.push('☔ Дождевик', '🌂 Зонт');
+            }
+
+            recommendations.push({
+                icon: '🧥',
+                category: 'Верх',
+                items: outerwear
+            });
+
+            // Низ
+            let bottom = [];
+            if (temp < 10) {
+                bottom = ['👖 Джинсы', '👖 Утепленные брюки'];
+            } else if (temp < 20) {
+                bottom = ['👖 Джинсы', '👖 Чиносы', '👗 Юбка'];
+            } else {
+                bottom = ['🩳 Шорты', '👗 Юбка', '👖 Легкие брюки'];
+            }
+
+            recommendations.push({
+                icon: '👖',
+                category: 'Низ',
+                items: bottom
+            });
+
+            // Обувь
+            let footwear = [];
+            if (temp < 5) {
+                footwear = ['👢 Ботинки', '👢 Сапоги'];
+            } else if (temp < 15) {
+                footwear = ['👟 Кроссовки', '👞 Туфли'];
+            } else {
+                footwear = ['👟 Кеды', '👡 Сандалии'];
+            }
+
+            if (hasPrecipitation) {
+                footwear.push('👢 Непромокаемая обувь');
+            }
+
+            recommendations.push({
+                icon: '👟',
+                category: 'Обувь',
+                items: footwear
+            });
+
+            // Аксессуары
+            let accessories = [];
+            if (temp < 5) {
+                accessories = ['🧤 Перчатки', '🧣 Шарф', '🎩 Шапка'];
+            } else if (temp < 15) {
+                accessories = ['🧣 Шарф', '🧢 Кепка'];
+            } else {
+                accessories = ['🕶️ Очки', '🧢 Кепка', '☀️ SPF'];
+            }
+
+            if (hasPrecipitation) accessories.push('☂️ Зонт');
+            if (isVeryWindy) accessories.push('🧣 Шарф');
+
+            recommendations.push({
+                icon: '🧤',
+                category: 'Аксессуары',
+                items: accessories
+            });
+
+            return recommendations;
+        }
+
+        // Переключение на вкладку погоды
+        window.switchToWeatherTab = function() {
+            const weatherTab = document.querySelector('[data-tab="weather-tab"]');
+            weatherTab.click();
+
+            if (currentCity) {
+                setTimeout(() => getWeather(), 100);
+            }
+        };
+
+        // Поиск по Enter
+        cityInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                getWeather();
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        clothingCityInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                getClothingRecommendation();
+                clothingSuggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Предотвращаем закрытие при клике на подсказки
+        suggestionsBox.addEventListener('click', (e) => e.stopPropagation());
+        clothingSuggestionsBox.addEventListener('click', (e) => e.stopPropagation());
     </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Прогноз погоды 🌤️</h1>
-        <div class="input-group">
-            <input type="text" id="city" placeholder="Введите название города">
-            <button onclick="getWeather()">Узнать</button>
-        </div>
-        <ul id="suggestions"></ul>
-        <div id="result"></div>
-    </div>
 </body>
 </html>

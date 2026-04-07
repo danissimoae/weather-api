@@ -16,7 +16,7 @@ router = APIRouter(
     tags=["Погода"],
 )
 
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="templates")
 geolocator = Nominatim(user_agent="weather_app")
 
 
@@ -26,7 +26,12 @@ async def home(request: Request):
     last_city = request.cookies.get("last_city")
     if last_city:
         last_city = last_city.encode('latin-1').decode('utf-8')
-    return templates.TemplateResponse("home.html", {"request": request, "last_city": last_city})
+    # Стало (добавьте context=):
+    return templates.TemplateResponse(
+        request=request,
+        name="home.html",
+        context={"last_city": last_city}
+    )
 
 
 @router.post("/")
@@ -57,9 +62,21 @@ async def get_weather(request: Request, city_data: CityData):
     except requests.RequestException as e:
         raise FetchingDataException
 
-    response = templates.TemplateResponse("weather.html", {"request": request, "city": city_data.city_data,
-                                                           "weather_data": weather_data, "current_time": current_time})
-    response.set_cookie(key="last_city", value=city_data.city_data.encode('utf-8').decode('latin-1'))
+    response = templates.TemplateResponse(
+        request=request,
+        name="weather.html",
+        context={
+            "city": city_data.city_data,
+            "weather_data": weather_data,
+            "current_time": current_time
+        }
+    )
+
+    response.set_cookie(
+        key="last_city",
+        value=city_data.city_data.encode('utf-8').decode('latin-1')
+    )
+
     return response
 
 
